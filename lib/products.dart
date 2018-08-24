@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import './pages/product.dart';
-
 // STATELESS EXAMPLE
 class Products extends StatelessWidget {
   final List<Map<String, String>> products; //final means value will never change in this execution context if it gets called again the data will be replaced

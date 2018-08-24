@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import './pages/manage.dart';
 import './pages/products.dart';
 import './pages/product.dart';
+import './pages/auth.dart';
 
 // void main() { //main function must be named "main" and must be in the main.dart file, void means it doesn't return anything
 //   runApp(MyApp());
@@ -52,6 +53,7 @@ class _MyAppState extends State<MyApp> {
       routes: { //can't use routes for dynamic paths though or passing data around (see onGenerateRoute below)
         '/': (BuildContext context) => ProductsPage(_products, _addProduct, _deleteProduct), //pass in the map and methods to make them avail to the sub page
         '/admin': (BuildContext context) => ManagePage(),
+        '/auth': (BuildContext context) => AuthPage(),
       },
       onGenerateRoute: (RouteSettings settings) {
         final List<String> pathElements = settings.name.split('/');
