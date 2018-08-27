@@ -35,37 +35,83 @@ class Post {
   }
 }
 
-class AuthPage extends StatelessWidget {
+class AuthPage extends StatefulWidget {
+  @override
+    State<StatefulWidget> createState() {
+      return _AuthPageState();
+    }
+}
+
+class _AuthPageState extends State<AuthPage> {
+  String _username = '';
+  String _password = '';
+  bool _acceptTerms = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Login'),
       ),
-      body: Column(children: <Widget>[
-        RaisedButton(
-          child: Text('LOGIN'),
-          onPressed: () {
-            Navigator.pushReplacementNamed( //results in the inability to go back (no back button)
-              context,
-              '/'
-            );
-          },
-        ),
-        FutureBuilder<Post>(
-          future: fetchPost(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Text(snapshot.data.title);
-            } else if (snapshot.hasError) {
-              return Text("${snapshot.error}");
-            }
+      body: Container(
+        margin: EdgeInsets.all(10.0),
+        child: ListView(children: <Widget>[
+          TextField(
+            decoration: InputDecoration(labelText: 'Username'),
+            keyboardType: TextInputType.emailAddress,
+            onChanged: (String value) { //fires every keystroke
+              setState(() {
+                _username = value;
+              });
+            },
+          ),
+          TextField(
+            obscureText: true,
+            decoration: InputDecoration(labelText: 'Password'),
+            onChanged: (String value) {
+              setState(() {
+                _password = value;
+              });
+            },
+          ),
+          SizedBox(height: 10.0),
+          SwitchListTile(
+            value: _acceptTerms,
+            onChanged: (bool value) {
+              setState(() {
+                _acceptTerms = value;
+              });
+            },
+            title: Text('Accept Terms')
+          ),
+          RaisedButton(
+            child: Text('LOGIN'),
+            color: Theme.of(context).accentColor,
+            textColor: Colors.white,
+            onPressed: () {
+              //send login info
+              Navigator.pushReplacementNamed( //results in the inability to go back (no back button)
+                context,
+                '/'
+              );
+            },
+          ),
+          SizedBox(height: 10.0),
+          FutureBuilder<Post>(
+            future: fetchPost(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Text(snapshot.data.title);
+              } else if (snapshot.hasError) {
+                return Text("${snapshot.error}");
+              }
 
-            // By default, show a loading spinner
-            return CircularProgressIndicator();
-          },
-        ),
-        ]),
+              // By default, show a loading spinner
+              return CircularProgressIndicator();
+            },
+          ),
+          ]),
+      )
     );
   }
 }
