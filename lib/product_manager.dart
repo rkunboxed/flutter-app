@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import './products.dart';
-import './product_control.dart';
 
 // STATEFUL EXAMPLE - 2 classes connected
 // class ProductManager extends StatefulWidget {
@@ -68,21 +67,15 @@ import './product_control.dart';
 // CONVERTING TO STATELESS - moved state to Main.DragTarget
 
 class ProductManager extends StatelessWidget {
-final List<Map<String, String>> products;
-final Function addProduct;
-final Function deleteProduct;
+final List<Map<String, dynamic>> products;
 
-ProductManager(this.products, this.addProduct, this.deleteProduct);
+ProductManager(this.products);
 
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      Container(
-        margin: EdgeInsets.all(10.0),
-        child: ProductControl(addProduct), //pass reference to the function
-      ),
       Expanded(
-        child: Products(products, deleteProduct: deleteProduct) //import custom products widget, send it the products list
+        child: Products(products) //import custom products widget, send it the products list
       )
     ],);
   }

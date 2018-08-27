@@ -25,9 +25,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  List <Map<String, String>> _products = [];
+  List <Map<String, dynamic>> _products = [];
 
-  void _addProduct(Map<String, String> product) { //void means it isn't going to return anything
+  void _addProduct(Map<String, dynamic> product) { //void means it isn't going to return anything
       setState(() {
         _products.add(product); 
       });
@@ -51,8 +51,8 @@ class _MyAppState extends State<MyApp> {
       ),
       //home: AuthPage(), //can only use this or the / in routes, not both
       routes: { //can't use routes for dynamic paths though or passing data around (see onGenerateRoute below)
-        '/': (BuildContext context) => ProductsPage(_products, _addProduct, _deleteProduct), //pass in the map and methods to make them avail to the sub page
-        '/admin': (BuildContext context) => ManagePage(),
+        '/': (BuildContext context) => ProductsPage(_products), //pass in the map and methods to make them avail to the sub page
+        '/admin': (BuildContext context) => ManagePage(_addProduct, _deleteProduct),
         '/auth': (BuildContext context) => AuthPage(),
       },
       onGenerateRoute: (RouteSettings settings) {
@@ -72,7 +72,7 @@ class _MyAppState extends State<MyApp> {
       },
       onUnknownRoute: (RouteSettings settings) { //if null is returned during another routing call
         return MaterialPageRoute(
-          builder: (BuildContext context) => ProductsPage(_products, _addProduct, _deleteProduct));
+          builder: (BuildContext context) => ProductsPage(_products));
       },
     );
   }

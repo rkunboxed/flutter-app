@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 
 // STATELESS EXAMPLE
 class Products extends StatelessWidget {
-  final List<Map<String, String>> products; //final means value will never change in this execution context if it gets called again the data will be replaced
-  final Function deleteProduct;
+  final List<Map<String, dynamic>> products; //final means value will never change in this execution context if it gets called again the data will be replaced
 
-  Products(this.products, {this.deleteProduct}); //constructor to grab data handed to it by the parent widget (see product_manager.dart)
+  Products(this.products); //constructor to grab data handed to it by the parent widget (see product_manager.dart)
 
   Widget _buildProductItem(BuildContext context, int index) {
     return Card(
@@ -19,12 +18,6 @@ class Products extends StatelessWidget {
                     FlatButton(child: 
                       Text('Details'),
                       onPressed: () => Navigator.pushNamed<bool>(context, '/product/' + index.toString())
-                        
-                      .then((bool value) {
-                        if (value) {
-                          deleteProduct(index);
-                        }
-                      }),
                     )
                   ],)
               ],
