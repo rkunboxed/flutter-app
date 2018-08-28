@@ -33,11 +33,11 @@ class _MyAppState extends State<MyApp> {
       });
   }
 
-  void _deleteProduct(int index) {
-    setState(() {
-      _products.removeAt(index);
-    });
-  }
+  // void _deleteProduct(int index) {
+  //   setState(() {
+  //     _products.removeAt(index);
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +52,7 @@ class _MyAppState extends State<MyApp> {
       //home: AuthPage(), //can only use this or the / in routes, not both
       routes: { //can't use routes for dynamic paths though or passing data around (see onGenerateRoute below)
         '/': (BuildContext context) => ProductsPage(_products), //pass in the map and methods to make them avail to the sub page
-        '/admin': (BuildContext context) => ManagePage(_addProduct, _deleteProduct),
+        '/admin': (BuildContext context) => ManagePage(_addProduct),
         '/auth': (BuildContext context) => AuthPage(),
       },
       onGenerateRoute: (RouteSettings settings) {

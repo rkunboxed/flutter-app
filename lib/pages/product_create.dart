@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ProductCreatePage extends StatefulWidget {
-
   final Function addProduct;
-  final Function deleteProduct;
 
-  ProductCreatePage(this.addProduct, this.deleteProduct);
+  ProductCreatePage(this.addProduct);
 
   @override
   State<StatefulWidget> createState() {
@@ -14,64 +12,103 @@ class ProductCreatePage extends StatefulWidget {
 }
 
 class _ProductCreatePageState extends State<ProductCreatePage> {
-  String _titleValue = '';
-  String _descValue = '';
-  double _priceValue = 0.0;
-  
+  final Map<String, dynamic> _formData = {
+    'title': null,
+    'description': null,
+    'price': null,
+    'image': 'assets/food.jpg'
+  };
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  Widget _buildTitleTextField() {
+    return TextFormField(
+      decoration: InputDecoration(labelText: 'Title'),
+      validator: (String value) {
+        if (value.isEmpty) {
+          return 'Title is required';
+        }
+      },
+      onSaved: (String value) {
+        //do not need to use set state since we aren't displaying it anywhere requiring a rerender (rerun the build method)
+        _formData['title'] = value;
+      },
+    );
+  }
+
+  Widget _buildDescriptionTextField() {
+    return TextFormField(
+      decoration: InputDecoration(labelText: 'Description'),
+      maxLines: 4,
+      validator: (String value) {
+        if (value.isEmpty || value.trim().length < 10) {
+          return 'Description is required and should be 10+ characters long.';
+        }
+      },
+      onSaved: (String value) {
+        _formData['description'] = value;
+      },
+    );
+  }
+
+  Widget _buildPriceTextField() {
+    return TextFormField(
+      decoration: InputDecoration(labelText: 'Price'),
+      keyboardType: TextInputType.number,
+      validator: (String value) {
+        if (value.isEmpty ||
+            !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value)) {
+          return 'Price is required and should be a number.';
+        }
+      },
+      onSaved: (String value) {
+        _formData['title'] = double.parse(value);
+      },
+    );
+  }
+
+  void _submitForm() {
+    if (!_formKey.currentState.validate()) {
+      return;
+    }
+    _formKey.currentState.save(); //executes onSave method for every text field
+    widget.addProduct(_formData);
+    Navigator.pushReplacementNamed(context, '/');
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.all(10.0),
-      child: ListView(children: <Widget>[
-      TextField(
-        decoration: InputDecoration(labelText: 'Title'),
-        onChanged: (String value) { //fires every keystroke
-          setState(() {
-            _titleValue = value;
-          });
-        },
+    final double deviceWidth = MediaQuery.of(context).size.width;
+    final double targetWidth = deviceWidth > 550.0 ? 500.0 : deviceWidth * 0.95;
+    final double targetPadding = deviceWidth - targetWidth;
+    return GestureDetector(
+      //use gesture detector to close the keyboard when user taps outside the form
+      onTap: () {
+        print('tapped');
+        FocusScope.of(context).requestFocus(FocusNode());
+      },
+      child: Container(
+        margin: EdgeInsets.all(10.0),
+        child: Form(
+          key: _formKey, //allows us to access this form object from other parts of the app
+          child: ListView(
+            padding: EdgeInsets.symmetric(horizontal: targetPadding / 2),
+            children: <Widget>[
+            _buildTitleTextField(),
+            _buildDescriptionTextField(),
+            _buildPriceTextField(),
+            SizedBox(height: 10.0),
+            RaisedButton(
+              child: Text('Save'),
+              color: Theme.of(context).accentColor,
+              textColor: Colors.white,
+              onPressed: () {
+                _submitForm();
+              },
+            ),
+          ]),
+        ),
       ),
-      TextField(
-        decoration: InputDecoration(labelText: 'Description'),
-        maxLines: 3,
-        onChanged: (String value) {
-          setState(() {
-            _descValue = value;
-          });
-        },
-      ),
-      TextField(
-        decoration: InputDecoration(labelText: 'Price'),
-        keyboardType: TextInputType.number,
-        onChanged: (String value) {
-          setState(() {
-            _priceValue = double.parse(value);
-          });
-        },
-      ),
-      SizedBox(height: 10.0),
-      RaisedButton(
-        child: Text('Save'),
-        color: Theme.of(context).accentColor,
-        textColor: Colors.white,
-        onPressed: () {
-          final Map<String, dynamic> product = {
-            'title': _titleValue,
-            'description': _descValue,
-            'price': _priceValue,
-            'image': 'assets/food.jpg'
-          };
-          widget.addProduct(product);
-          Navigator.pushReplacementNamed(context, '/');
-          // showModalBottomSheet(
-          //     context: context,
-          //     builder: (BuildContext context) {
-          //       return Column(children: <Widget>[
-          //         Text('This is a modal'),
-          //       ]);
-          //     });
-        },
-      ),
-    ]));
+    );
   }
 }
