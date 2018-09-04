@@ -19,17 +19,26 @@ class _AuthPageState extends State<AuthPage> {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  DecorationImage _buildBackground() {
+    return DecorationImage(
+        image: AssetImage('assets/mtn-road.jpg'),
+        fit: BoxFit.cover,
+        colorFilter:
+            ColorFilter.mode(Colors.white.withOpacity(0.5), BlendMode.dstATop));
+  }
+
   Widget _buildEmailTextField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: 'Email', filled: true, fillColor: Colors.white),
+      decoration: InputDecoration(
+          labelText: 'Email', filled: true, fillColor: Colors.white),
       keyboardType: TextInputType.emailAddress,
       validator: (String value) {
         if (value.isEmpty) {
           return 'Email is required';
-        // } else if (!RegExp(
-        //         r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
-        //     .hasMatch(value)) {
-        //   return 'Entry must be in a valid email format';
+          // } else if (!RegExp(
+          //         r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+          //     .hasMatch(value)) {
+          //   return 'Entry must be in a valid email format';
         }
       },
       onSaved: (String value) {
@@ -41,7 +50,8 @@ class _AuthPageState extends State<AuthPage> {
 
   Widget _buildPasswordTextField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: 'Password', filled: true, fillColor: Colors.white),
+      decoration: InputDecoration(
+          labelText: 'Password', filled: true, fillColor: Colors.white),
       obscureText: true,
       validator: (String value) {
         if (value.isEmpty) {
@@ -56,14 +66,13 @@ class _AuthPageState extends State<AuthPage> {
 
   Widget _buildSwitchListTile() {
     return SwitchListTile(
-      value: _acceptTerms,
-      onChanged: (bool value) {
-        setState(() {
-          _acceptTerms = value;
-        });
-      },
-      title: Text('Accept Terms')
-    );
+        value: _acceptTerms,
+        onChanged: (bool value) {
+          setState(() {
+            _acceptTerms = value;
+          });
+        },
+        title: Text('Accept Terms'));
   }
 
   Future _authenticate() async {
@@ -78,22 +87,23 @@ class _AuthPageState extends State<AuthPage> {
     var _authHeader = 'Basic ' + _auth64;
 
     HttpClient client = new HttpClient();
-    client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
-    client.postUrl(Uri.parse('https://redfalcondev.com/auth/login/'))
+    client.badCertificateCallback =
+        (X509Certificate cert, String host, int port) => true;
+    client
+        .postUrl(Uri.parse('https://yourloginurl.com'))
         .then((HttpClientRequest request) {
-          request.headers.add(HttpHeaders.CONTENT_TYPE, 'application/json');
-          request.headers.add(HttpHeaders.AUTHORIZATION, _authHeader);
+      request.headers.add(HttpHeaders.CONTENT_TYPE, 'application/json');
+      request.headers.add(HttpHeaders.AUTHORIZATION, _authHeader);
 
-          return request.close();
-        })
-        .then((HttpClientResponse response) {
-          print(response.statusCode);
-          // Process the response.
-          if (response.statusCode == 200) {
-            print('YOU DID IT');
-            Navigator.pushReplacementNamed(context, '/');
-          }
-        });
+      return request.close();
+    }).then((HttpClientResponse response) {
+      print(response.statusCode);
+      // Process the response.
+      if (response.statusCode == 200) {
+        print('YOU DID IT');
+        Navigator.pushReplacementNamed(context, '/');
+      }
+    });
   }
 
   // test how to open up a new web url (not linked to form data)
@@ -101,7 +111,7 @@ class _AuthPageState extends State<AuthPage> {
   //   final String clientId = '123';
   //   final String redirect = 'http://google.com';
   //   final String url = 'https://flow.polar.com/oauth2/authorization?response_type=code&client_id=' + clientId + '&redirect_uri=' + redirect;
-    
+
   //   if (await canLaunch(url)) {
   //     await launch(url);
   //   } else {
@@ -111,38 +121,42 @@ class _AuthPageState extends State<AuthPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double deviceWidth = MediaQuery.of(context).size.width;
+    final double targetWidth = deviceWidth > 550.0 ? 350.0 : deviceWidth * 0.95;
+
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Login'),
-        ),
-        body: Container(
-            decoration: BoxDecoration(image: DecorationImage(
-              image: AssetImage('assets/mtn-road.jpg'),
-              fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(Colors.white.withOpacity(0.5), BlendMode.dstATop)
-              )),
-            padding: EdgeInsets.all(20.0),
-            child: Form(
-              key: _formKey,
-              child: Column(children: <Widget>[
-                _buildEmailTextField(),
-                SizedBox(height: 10.0),
-                _buildPasswordTextField(),
-                SizedBox(height: 10.0),
-                _buildSwitchListTile(),
-                RaisedButton(
-                  child: Text('LOGIN'),
-                  color: Theme.of(context).accentColor,
-                  textColor: Colors.white,
-                  onPressed: () {
-                    //_submitCreds();
-                    //_launchURL();
-                    _authenticate();
-                  },
-                ),
-              ]),
-            ),
+      appBar: AppBar(
+        title: Text('Login'),
+      ),
+      body: Container(
+        decoration: BoxDecoration(image: _buildBackground()),
+        padding: EdgeInsets.all(20.0),
+        child: Center(
+          child: Form(
+            key: _formKey,
+            child: Container(
+                //width: MediaQuery.of(context).size.width * 0.8, // 80% of device width
+                width: targetWidth,
+                child: Column(children: <Widget>[
+                  _buildEmailTextField(),
+                  SizedBox(height: 10.0),
+                  _buildPasswordTextField(),
+                  SizedBox(height: 10.0),
+                  _buildSwitchListTile(),
+                  RaisedButton(
+                    child: Text('LOGIN'),
+                    color: Theme.of(context).accentColor,
+                    textColor: Colors.white,
+                    onPressed: () {
+                      //_submitCreds();
+                      //_launchURL();
+                      _authenticate();
+                    },
+                  ),
+                ])),
           ),
-        );
+        ),
+      ),
+    );
   }
 }

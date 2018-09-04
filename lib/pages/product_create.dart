@@ -68,6 +68,17 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
     );
   }
 
+  Widget _buildCustomButton(BuildContext context) {
+    return GestureDetector(
+        onTap: _submitForm,
+        child: Container(
+          margin: EdgeInsets.all(20.0),
+          padding: EdgeInsets.all(10.0),
+          child: Text('Create New Product', style: TextStyle(color: Colors.white), textAlign: TextAlign.center),
+          color: Theme.of(context).accentColor,
+        ));
+  }
+
   void _submitForm() {
     if (!_formKey.currentState.validate()) {
       return;
@@ -91,23 +102,17 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
       child: Container(
         margin: EdgeInsets.all(10.0),
         child: Form(
-          key: _formKey, //allows us to access this form object from other parts of the app
+          key:
+              _formKey, //allows us to access this form object from other parts of the app
           child: ListView(
-            padding: EdgeInsets.symmetric(horizontal: targetPadding / 2),
-            children: <Widget>[
-            _buildTitleTextField(),
-            _buildDescriptionTextField(),
-            _buildPriceTextField(),
-            SizedBox(height: 10.0),
-            RaisedButton(
-              child: Text('Save'),
-              color: Theme.of(context).accentColor,
-              textColor: Colors.white,
-              onPressed: () {
-                _submitForm();
-              },
-            ),
-          ]),
+              padding: EdgeInsets.symmetric(horizontal: targetPadding / 2),
+              children: <Widget>[
+                _buildTitleTextField(),
+                _buildDescriptionTextField(),
+                _buildPriceTextField(),
+                SizedBox(height: 10.0),
+                _buildCustomButton(context),
+              ]),
         ),
       ),
     );
