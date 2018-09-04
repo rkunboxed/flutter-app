@@ -1,41 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 import 'dart:async';
 import 'dart:convert';
-
-Future<Post> fetchPost() async {
-  final response =
-      await http.get('https://jsonplaceholder.typicode.com/posts/1');
-
-  if (response.statusCode == 200) {
-    // If the call to the server was successful, parse the JSON
-    return Post.fromJson(json.decode(response.body));
-
-  } else {
-    // If that call was not successful, throw an error.
-    throw Exception('Failed to load post');
-  }
-}
-
-class Post {
-  final int userId;
-  final int id;
-  final String title;
-  final String body;
-
-  Post({this.userId, this.id, this.title, this.body});
-
-  factory Post.fromJson(Map<String, dynamic> json) {
-    return Post(
-      userId: json['userId'],
-      id: json['id'],
-      title: json['title'],
-      body: json['body'],
-    );
-  }
-}
+import 'dart:io';
 
 class AuthPage extends StatefulWidget {
   @override
@@ -53,15 +21,15 @@ class _AuthPageState extends State<AuthPage> {
 
   Widget _buildEmailTextField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: 'Email'),
+      decoration: InputDecoration(labelText: 'Email', filled: true, fillColor: Colors.white),
       keyboardType: TextInputType.emailAddress,
       validator: (String value) {
         if (value.isEmpty) {
           return 'Email is required';
-        } else if (!RegExp(
-                r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
-            .hasMatch(value)) {
-          return 'Entry must be in a valid email format';
+        // } else if (!RegExp(
+        //         r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+        //     .hasMatch(value)) {
+        //   return 'Entry must be in a valid email format';
         }
       },
       onSaved: (String value) {
@@ -73,7 +41,7 @@ class _AuthPageState extends State<AuthPage> {
 
   Widget _buildPasswordTextField() {
     return TextFormField(
-      decoration: InputDecoration(labelText: 'Password'),
+      decoration: InputDecoration(labelText: 'Password', filled: true, fillColor: Colors.white),
       obscureText: true,
       validator: (String value) {
         if (value.isEmpty) {
@@ -81,7 +49,6 @@ class _AuthPageState extends State<AuthPage> {
         }
       },
       onSaved: (String value) {
-        //do not need to use setState since we aren't displaying it anywhere requiring a rerender (rerun the build method)
         _password = value;
       },
     );
@@ -99,33 +66,48 @@ class _AuthPageState extends State<AuthPage> {
     );
   }
 
-  //testing plain old get request (not linked to form data)
-  void _submitCreds() {
-    // validate form fields
+  Future _authenticate() async {
     if (!_formKey.currentState.validate()) {
-      return;
+      return null;
     }
-    _formKey.currentState.save(); //executes onSave method for every text field
-    // TODO: VALIDATE CREDS
+    _formKey.currentState.save();
 
-    // test generic HTTP get request
-    fetchPost().then((response) {
-      Navigator.pushReplacementNamed(context, '/');
-    });
+    var _authString = _email + ':' + _password;
+    var _authBytes = utf8.encode(_authString);
+    var _auth64 = base64.encode(_authBytes);
+    var _authHeader = 'Basic ' + _auth64;
+
+    HttpClient client = new HttpClient();
+    client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+    client.postUrl(Uri.parse('https://redfalcondev.com/auth/login/'))
+        .then((HttpClientRequest request) {
+          request.headers.add(HttpHeaders.CONTENT_TYPE, 'application/json');
+          request.headers.add(HttpHeaders.AUTHORIZATION, _authHeader);
+
+          return request.close();
+        })
+        .then((HttpClientResponse response) {
+          print(response.statusCode);
+          // Process the response.
+          if (response.statusCode == 200) {
+            print('YOU DID IT');
+            Navigator.pushReplacementNamed(context, '/');
+          }
+        });
   }
 
   // test how to open up a new web url (not linked to form data)
-  _launchURL() async {
-  final String clientId = '123';
-  final String redirect = 'http://google.com';
-  final String url = 'https://flow.polar.com/oauth2/authorization?response_type=code&client_id=' + clientId + '&redirect_uri=' + redirect;
-  
-  if (await canLaunch(url)) {
-    await launch(url);
-  } else {
-    throw 'Could not launch $url';
-  }
-}
+  // _launchURL() async {
+  //   final String clientId = '123';
+  //   final String redirect = 'http://google.com';
+  //   final String url = 'https://flow.polar.com/oauth2/authorization?response_type=code&client_id=' + clientId + '&redirect_uri=' + redirect;
+    
+  //   if (await canLaunch(url)) {
+  //     await launch(url);
+  //   } else {
+  //     throw 'Could not launch $url';
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -133,13 +115,18 @@ class _AuthPageState extends State<AuthPage> {
         appBar: AppBar(
           title: Text('Login'),
         ),
-        body: Column(children: <Widget>[
-          Container(
-            margin: EdgeInsets.all(20.0),
+        body: Container(
+            decoration: BoxDecoration(image: DecorationImage(
+              image: AssetImage('assets/mtn-road.jpg'),
+              fit: BoxFit.cover,
+              colorFilter: ColorFilter.mode(Colors.white.withOpacity(0.5), BlendMode.dstATop)
+              )),
+            padding: EdgeInsets.all(20.0),
             child: Form(
               key: _formKey,
               child: Column(children: <Widget>[
                 _buildEmailTextField(),
+                SizedBox(height: 10.0),
                 _buildPasswordTextField(),
                 SizedBox(height: 10.0),
                 _buildSwitchListTile(),
@@ -149,27 +136,13 @@ class _AuthPageState extends State<AuthPage> {
                   textColor: Colors.white,
                   onPressed: () {
                     //_submitCreds();
-                    _launchURL();
+                    //_launchURL();
+                    _authenticate();
                   },
                 ),
               ]),
             ),
           ),
-          // Container(
-          //     margin: EdgeInsets.all(20.0),
-          //     child: FutureBuilder<Post>(
-          //       future: fetchPost(),
-          //       builder: (context, snapshot) {
-          //         if (snapshot.hasData) {
-          //           return Text(snapshot.data.title);
-          //         } else if (snapshot.hasError) {
-          //           return Text("${snapshot.error}");
-          //         }
-
-          //         // By default, show a loading spinner
-          //         return CircularProgressIndicator();
-          //       },
-          //     ))
-        ]));
+        );
   }
 }

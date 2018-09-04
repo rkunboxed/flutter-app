@@ -19,6 +19,7 @@ class ManagePage extends StatelessWidget {
             children: <Widget>[
               AppBar(automaticallyImplyLeading: false, title: Text('Uhhhh')),
               ListTile(
+                leading: Icon(Icons.shop),
                 title: Text('Back to Products'),
                 onTap: () {
                   Navigator.pushReplacementNamed(

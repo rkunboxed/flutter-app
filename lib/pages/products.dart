@@ -13,7 +13,10 @@ class ProductsPage extends StatelessWidget {
       drawer: Drawer(
           child: Column(
         children: <Widget>[
-          AppBar(automaticallyImplyLeading: false, title: Text('Choose')),
+          AppBar(
+            automaticallyImplyLeading: false, 
+            title: Text('Choose'),
+          ),
           ListTile(
             title: Text('Login'),
             onTap: () {
@@ -21,6 +24,7 @@ class ProductsPage extends StatelessWidget {
             }
           ),
           ListTile(
+            leading: Icon(Icons.edit),
             title: Text('Manage Products'),
             onTap: () {
               Navigator.pushReplacementNamed(context, '/admin');
@@ -29,7 +33,13 @@ class ProductsPage extends StatelessWidget {
         ],
       )),
       appBar: AppBar(
-        title: Text('Hello World'),
+        title: Text('reddiyo'),
+        actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.favorite),
+                onPressed: () => {},
+              )
+            ]
       ),
       body: ProductManager(products),
     );

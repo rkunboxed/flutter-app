@@ -16,7 +16,8 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
     'title': null,
     'description': null,
     'price': null,
-    'image': 'assets/food.jpg'
+    'image': 'assets/food.jpg',
+    'location': 'Sterling, VA'
   };
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -62,7 +63,7 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
         }
       },
       onSaved: (String value) {
-        _formData['title'] = double.parse(value);
+        _formData['price'] = double.parse(value);
       },
     );
   }
